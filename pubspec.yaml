@@ -7,8 +7,12 @@ environment:
   sdk: '>=3.0.6 <4.0.0'
 
 dependencies:
+  intl: ^0.17.0
+  percent_indicator: ^4.0.1
+
   flutter:
     sdk: flutter
+    
 
 dev_dependencies:
   flutter_test:
