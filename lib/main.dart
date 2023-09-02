@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_list/task.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -65,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     percent=completeTaskCnt/tasks.length;
   }
 
+  
  }
 
   @override
@@ -104,13 +108,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           isModifying=false;
                         })
                         :setState(() {
-                          var task=Task(_textController.text);
-                          tasks.add(task);
+                          var task=Task(
+                            id: 0,
+                            work: _textController.text,
+                            isComplete: false);
+                          addTaskToServer(task);
                           _textController.clear();
                         });
                         updatePercent();
                       }
-                      
                     },
                     child: isModifying ? const Text("수정") : const Text("추가"),
                   )
@@ -194,4 +200,18 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     );
   }
+  
+  addTaskToServer(Task task) async {
+    print("${task.work} ${task.isComplete}");
+    final response = await http.post(
+      // http.post post 형식으로 통신할 것이고 Uri.http의 경우 10.0.2.2:8000 주소로 보낼 거며 추가 주소로 /positng/addTask로 보낸다
+      Uri.http('10.0.2.2:8000','/posting/addTodo'),
+      // headers는 해당 데이터의 머리에 이 Content의 타입이 Json형식이다
+      headers: {'Content-type': 'application/json'},
+      // body로는 Json으로 Encode 된 task 데이터를 보내 주겠다
+      // 이 경우에 Task객체에 toJson 함수를 만들어 놓지 않을 시 jsonEncode가 연결을 해주지 않으며 오류가 난다.
+      body: jsonEncode(task));
+    print("response is = ${response.body}");
+  }
+  
 }
